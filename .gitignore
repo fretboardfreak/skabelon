@@ -1,0 +1,13 @@
+!.gitignore
+
+*.pyc
+*.swp
+__pycache__
+
+.DS_Store
+
+# setuptools files
+.eggs
+build
+dist
+src/skabelon.egg-info

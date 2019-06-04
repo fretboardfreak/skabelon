@@ -23,13 +23,14 @@ DEBUG = False
 
 
 def main():
+    """Main entrypoint for skabelon."""
     args = parse_cmd_line()
     dprint(args)
 
     env = Environment(loader=FileSystemLoader(str(args.templates)))
 
     spec = spec_from_file_location(args.dispatch.stem,
-                                                  args.dispatch.as_posix())
+                                   args.dispatch.as_posix())
     dispatcher = module_from_spec(spec)
     spec.loader.exec_module(dispatcher)
 
@@ -69,6 +70,7 @@ def key_value_pairs(error_message, input_string):
 
 
 def parse_cmd_line():
+    """Parse the command line arguments and return the results."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         '--version', help='Print the version and exit.', action='version',
@@ -120,13 +122,16 @@ class DebugAction(argparse.Action):
 
     @classmethod
     def add_parser_argument(cls, parser):
+        """Add an argument to the given parser for this Action object."""
         parser.add_argument(cls.sflag, cls.flag, help=cls.help, action=cls)
 
     def __init__(self, option_strings, dest, **kwargs):
+        """Initialize this Action object."""
         super(DebugAction, self).__init__(option_strings, dest, nargs=0,
                                           default=False, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
+        """Perform the Action when called from the ArgumentParser."""
         global DEBUG
         DEBUG = True
         setattr(namespace, self.dest, True)
@@ -140,6 +145,7 @@ class VerboseAction(DebugAction):
     help = 'Enable verbose output.'
 
     def __call__(self, parser, namespace, values, option_string=None):
+        """Perform the Action when called from the ArgumentParser."""
         global VERBOSE
         VERBOSE = True
         setattr(namespace, self.dest, True)
@@ -174,8 +180,8 @@ CLI Signature::
 - dispatch: DISPATCH_SCRIPT is a python module containing a method named
   "dispatch" that yields objects that are incorporated into the Jinja2
   Environment object used in the render method as well as output file names for
-  the results. For each yield call by the dispatch method a corresponding render
-  call is made.
+  the results. For each yield call by the dispatch method a corresponding
+  render call is made.
 
 -  dispatch-opt: provide key/value option pairs to be passed into the dispatch
    method.

@@ -34,7 +34,14 @@ def main():
     dispatcher = module_from_spec(spec)
     spec.loader.exec_module(dispatcher)
 
-    dispatch_args = dict(args.dispatch_opts)
+    dispatch_args = {}
+    dprint('dispatch opts string: %s' % args.dispatch_opts)
+    for input_str in args.dispatch_opts:
+        if ':' not in input_str:
+            raise Exception('--dispatch-args must be passed a key:value par '
+                            'separated by a ":"')
+        key, value = input_str.split(':')
+        dispatch_args[key] = value
 
     for tname, context, output_file in dispatcher.dispatch(**dispatch_args):
         template = env.get_template(tname)
@@ -60,13 +67,6 @@ def dispatch_file(error_message, input_string):
         return path
     else:
         raise argparse.ArgumentTypeError(error_message)
-
-
-def key_value_pairs(error_message, input_string):
-    """Ensure that the input string is a colon separated key value pair."""
-    if ':' not in input_string:
-        raise argparse.ArgumentTypeError(error_message)
-    return tuple(input_string.split(':'))
 
 
 def parse_cmd_line():
@@ -96,7 +96,7 @@ def parse_cmd_line():
         '--dispatch-opt', dest='dispatch_opts',
         help=('KEY:VALUE pairs to be passed into the dispatch method. '
               'Can be used more than once.'),
-        action='append', type=partial(key_value_pairs, error_message))
+        action='append', default=[])
 
     return parser.parse_args()
 

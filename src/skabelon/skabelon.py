@@ -35,12 +35,19 @@ def main():
     spec.loader.exec_module(dispatcher)
 
     dispatch_args = {}
-    dprint('dispatch opts string: %s' % args.dispatch_opts)
     for input_str in args.dispatch_opts:
+        err_msg = ('--dispatch-args must be passed a key:value par '
+                   'separated by a ":"')
         if ':' not in input_str:
-            raise Exception('--dispatch-args must be passed a key:value par '
-                            'separated by a ":"')
-        key, value = input_str.split(':')
+            raise Exception(err_msg)
+        parts = input_str.split(':')
+        if len(parts) > 2:
+            key = parts[0]
+            value = ':'.join(parts[1:])
+        elif len(parts) == 2:
+            key, value = input_str.split(':')
+        else:
+            raise Exception(err_msg)
         dispatch_args[key] = value
 
     for tname, context, output_file in dispatcher.dispatch(**dispatch_args):
